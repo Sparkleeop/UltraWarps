@@ -1,0 +1,47 @@
+config-version: 1
+
+storage:
+  type: YAML # YAML or JSON
+
+messages:
+  prefix: "&8[&aUltraWarps&8]"
+
+  warp-created:
+    header: "&a✓ &a&lWARP CREATED &a✓"
+    body: "&7Warp &a%warp% &7has been created"
+
+  warp-deleted:
+    header: "&c✗ &c&lWARP DELETED &c✗"
+    body: "&7Warp &c%warp% &7has been deleted"
+
+  teleport:
+    timer-title: "&aTeleporting in &f%seconds%&a..."
+    timer-subtitle: "&7Do not move"
+    cancelled: "&cTeleport cancelled because you moved."
+    success:
+      header: "&a✓ &a&lTELEPORT SUCCESS &a✓"
+      body: "&7You have been teleported to &a%warp%"
+
+  usage:
+    invalid:
+      header: "&c✗ &c&lINVALID USAGE &c✗"
+      body: "&7Usage: &a/warp <name>"
+
+  list-warps:
+    header: "&a&lAVAILABLE WARPS"
+    format: "&a➤ &f%warp%"
+
+  reload:
+    start: "&a↻ Reloading configuration..."
+    success: "&a✓ Configuration reloaded in &f%time%ms"
+
+  help:
+    header: "&a&lULTRAWARPS COMMANDS"
+    format: "&a➤ &f%command% &7- %description%"
+
+  info:
+    header: "&a&lULTRAWARPS INFORMATION"
+    version: "&7• Version: &a%version%"
+    warps: "&7• Total Warps: &a%warps%"
+    storage: "&7• Storage: &a%storage%"
+

@@ -1,0 +1,30 @@
+name: UltraWarps
+version: '1.0.0'
+main: me.sparklee.UltraWarps.UltraWarps
+api-version: '1.20'
+folia-supported: true
+
+commands:
+  warp:
+    description: Teleport to a server warp
+    usage: /warp <name>
+    permission: ultrawarps.use
+
+  listwarps:
+    description: List all available server warps
+    usage: /listwarps
+    permission: ultrawarps.list
+
+  ultrawarps:
+    description: Admin commands for UltraWarps
+    permission: ultrawarps.admin
+    aliases:
+      - uw
+
+permissions:
+  ultrawarps.use:
+    default: true
+  ultrawarps.list:
+    default: true
+  ultrawarps.admin:
+    default: op
