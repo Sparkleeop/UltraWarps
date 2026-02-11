@@ -51,7 +51,7 @@ public final class UltraWarps extends JavaPlugin {
     @Override
     public void onDisable() {
         if (warpManager != null) {
-            warpManager.saveWarpsAsync();
+            warpManager.saveWarpsSync();
         }
     }
 

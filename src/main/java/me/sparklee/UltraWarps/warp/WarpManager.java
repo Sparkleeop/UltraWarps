@@ -29,6 +29,8 @@ public class WarpManager {
                 plugin,
                 () -> WarpStorage.save(plugin, warps)
         );
+
+
     }
 
     public Warp getWarp(String name) {
@@ -46,4 +48,8 @@ public class WarpManager {
     public Collection<Warp> getWarps() {
         return warps.values();
     }
+    public void saveWarpsSync() {
+        WarpStorage.save(plugin, warps);
+    }
+
 }
