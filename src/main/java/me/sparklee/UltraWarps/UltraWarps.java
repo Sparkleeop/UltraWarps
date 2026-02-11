@@ -1,6 +1,7 @@
 package me.sparklee.UltraWarps;
 
 import me.sparklee.UltraWarps.command.*;
+import me.sparklee.UltraWarps.listener.TeleportListener;
 import me.sparklee.UltraWarps.util.ConfigManager;
 import me.sparklee.UltraWarps.warp.WarpManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -36,6 +37,12 @@ public final class UltraWarps extends JavaPlugin {
 
         Objects.requireNonNull(getCommand("listwarps"))
                 .setExecutor(new ListWarpsCommand(warpManager));
+
+        getServer().getPluginManager().registerEvents(
+                new TeleportListener(),
+                this
+        );
+
 
         getLogger().info("UltraWarps enabled");
     }

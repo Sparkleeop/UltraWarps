@@ -4,16 +4,17 @@ import me.sparklee.UltraWarps.UltraWarps;
 import me.sparklee.UltraWarps.warp.Warp;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class TeleportUtil {
 
-    private static final Map<UUID, Location> pending = new ConcurrentHashMap<>();
+    private static final Map<UUID, BukkitTask> pendingTasks = new HashMap<>();
+    private static final Map<UUID, Integer> countdowns = new HashMap<>();
 
     private static UltraWarps plugin() {
         return UltraWarps.getInstance();
@@ -21,63 +22,102 @@ public class TeleportUtil {
 
     public static void startTeleport(Player player, Warp warp, int seconds) {
 
-        pending.put(player.getUniqueId(), player.getLocation().clone());
-
-        for (int i = seconds; i > 0; i--) {
-            int time = i;
-
-            Bukkit.getScheduler().runTaskLater(
-                    plugin(),
-                    () -> {
-                        if (!pending.containsKey(player.getUniqueId())) return;
-
-                        player.showTitle(Title.title(
-                                MessageUtil.color(
-                                        plugin().getConfig()
-                                                .getString("messages.teleport.timer-title")
-                                                .replace("%seconds%", String.valueOf(time))
-                                ),
-                                MessageUtil.color(
-                                        plugin().getConfig()
-                                                .getString("messages.teleport.timer-subtitle")
-                                )
-                        ));
-                    },
-                    (seconds - i) * 20L
-            );
+        if (pendingTasks.containsKey(player.getUniqueId())) {
+            pendingTasks.get(player.getUniqueId()).cancel();
         }
 
-        Bukkit.getScheduler().runTaskLater(
-                plugin(),
-                () -> finishTeleport(player, warp),
-                seconds * 20L
+        countdowns.put(player.getUniqueId(), seconds);
+
+        BukkitTask task = Bukkit.getScheduler().runTaskTimer(plugin(), () -> {
+
+            int timeLeft = countdowns.get(player.getUniqueId());
+
+            if (timeLeft <= 0) {
+                finishTeleport(player, warp);
+                return;
+            }
+
+            player.showTitle(Title.title(
+                    MessageUtil.color(
+                            plugin().getConfig()
+                                    .getString("messages.teleport.timer-title")
+                                    .replace("%seconds%", String.valueOf(timeLeft))
+                    ),
+                    MessageUtil.color(
+                            plugin().getConfig()
+                                    .getString("messages.teleport.timer-subtitle")
+                    )
+            ));
+
+            countdowns.put(player.getUniqueId(), timeLeft - 1);
+
+        }, 0L, 20L);
+
+        pendingTasks.put(player.getUniqueId(), task);
+    }
+
+    public static void cancelTeleport(Player player) {
+
+        UUID uuid = player.getUniqueId();
+
+        if (!pendingTasks.containsKey(uuid)) return;
+
+        pendingTasks.get(uuid).cancel();
+        pendingTasks.remove(uuid);
+        countdowns.remove(uuid);
+
+        player.showTitle(Title.title(
+                MessageUtil.color(
+                        plugin().getConfig().getString("messages.teleport.cancelled-title")
+                ),
+                MessageUtil.color(
+                        plugin().getConfig().getString("messages.teleport.cancelled-subtitle")
+                )
+        ));
+
+        MessageUtil.send(
+                player,
+                plugin().getConfig().getString("messages.teleport.cancelled")
         );
     }
 
     private static void finishTeleport(Player player, Warp warp) {
 
-        Location start = pending.get(player.getUniqueId());
-        if (start == null) return;
+        UUID uuid = player.getUniqueId();
 
-        Location now = player.getLocation();
-        if (start.distanceSquared(now) > 0.01) {
-            pending.remove(player.getUniqueId());
-            MessageUtil.send(
-                    player,
-                    plugin().getConfig().getString("messages.teleport.cancelled")
-            );
-            return;
-        }
+        if (!pendingTasks.containsKey(uuid)) return;
 
-        pending.remove(player.getUniqueId());
+        pendingTasks.get(uuid).cancel();
+        pendingTasks.remove(uuid);
+        countdowns.remove(uuid);
 
         player.teleportAsync(warp.getLocation()).thenRun(() -> {
+
+            player.showTitle(Title.title(
+                    MessageUtil.color(
+                            plugin().getConfig()
+                                    .getString("messages.teleport.success.title")
+                                    .replace("%warp%", warp.getName())
+                    ),
+                    MessageUtil.color(
+                            plugin().getConfig()
+                                    .getString("messages.teleport.success.subtitle")
+                                    .replace("%warp%", warp.getName())
+                    )
+            ));
+
             MessageUtil.sendHeaderBody(
                     player,
-                    plugin().getConfig().getString("messages.teleport.success.header"),
-                    plugin().getConfig().getString("messages.teleport.success.body")
+                    plugin().getConfig()
+                            .getString("messages.teleport.success.header"),
+                    plugin().getConfig()
+                            .getString("messages.teleport.success.body")
                             .replace("%warp%", warp.getName())
             );
         });
+    }
+
+    public static boolean isTeleporting(Player player) {
+        return pendingTasks.containsKey(player.getUniqueId());
     }
 }

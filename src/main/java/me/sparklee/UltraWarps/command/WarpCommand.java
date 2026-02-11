@@ -1,5 +1,6 @@
 package me.sparklee.UltraWarps.command;
 
+import me.sparklee.UltraWarps.UltraWarps;
 import me.sparklee.UltraWarps.util.TeleportUtil;
 import me.sparklee.UltraWarps.warp.Warp;
 import me.sparklee.UltraWarps.warp.WarpManager;
@@ -50,7 +51,12 @@ public class WarpCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        TeleportUtil.startTeleport(player, warp, 3);
+        int countdown = UltraWarps.getInstance()
+                .getConfig()
+                .getInt("teleport.countdown", 3);
+
+        TeleportUtil.startTeleport(player, warp, countdown);
+
         return true;
     }
 

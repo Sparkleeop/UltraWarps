@@ -3,6 +3,9 @@ config-version: 1
 storage:
   type: YAML # YAML or JSON
 
+teleport:
+  countdown: 3
+
 messages:
   prefix: "&8[&aUltraWarps&8]"
 
@@ -17,8 +20,14 @@ messages:
   teleport:
     timer-title: "&aTeleporting in &f%seconds%&a..."
     timer-subtitle: "&7Do not move"
+
     cancelled: "&cTeleport cancelled because you moved."
+    cancelled-title: "&c✗ &c&lTELEPORT CANCELLED"
+    cancelled-subtitle: "&7You moved."
+
     success:
+      title: "&a✓ &a&lTELEPORT SUCCESS"
+      subtitle: "&7Warped to &a%warp%"
       header: "&a✓ &a&lTELEPORT SUCCESS &a✓"
       body: "&7You have been teleported to &a%warp%"
 
