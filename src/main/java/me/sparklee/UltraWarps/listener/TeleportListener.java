@@ -12,9 +12,14 @@ public class TeleportListener implements Listener {
 
         if (!TeleportUtil.isTeleporting(event.getPlayer())) return;
 
-        if (event.getFrom().getX() == event.getTo().getX() &&
-                event.getFrom().getY() == event.getTo().getY() &&
-                event.getFrom().getZ() == event.getTo().getZ()) return;
+        if (event.getTo() == null) return;
+
+        // Only cancel if actual block position changed
+        if (event.getFrom().getBlockX() == event.getTo().getBlockX()
+                && event.getFrom().getBlockY() == event.getTo().getBlockY()
+                && event.getFrom().getBlockZ() == event.getTo().getBlockZ()) {
+            return; // Only rotation changed, ignore
+        }
 
         TeleportUtil.cancelTeleport(event.getPlayer());
     }
